@@ -1,51 +1,49 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { Container } from './Container';
 import VoteActions from './VoteActions';
 import VoteResults from './VoteResults';
 
-class Feedback extends Component {
- 
-    state = {
-        good: 0,
-        neutral: 0,
-        bad: 0
-    }
-    clickBtnVote = stateName => {
-        this.setState((prevState) => {
-            const value = this.state[stateName];
-            return {
-                [stateName]: value + 1
-            }
-        })
-    }
-    countTotalFeedback () {
-        const { good, neutral, bad } = this.state;
+export default function Feedback() {
+    const [good, setGood] = useState(0);
+    const [neutral, setNeutral] = useState(0);
+    const [bad, setBad] = useState(0);
+
+    const countTotalFeedback= () => {
         return good + neutral + bad;
     }
-    countPositiveFeedbackPercentage() {
-        const { good, neutral, bad } = this.state;
-        const total = good + neutral + bad;
+    const countPositiveFeedbackPercentage = (good) => {
+        const total = countTotalFeedback();
         if (!total) {
             return 0;
         }
-        return Math.round((good / total) * 100);
-       
+        return Math.round((good / total) * 100); 
     }
-    
-    render() {
-        const { good, neutral, bad } = this.state;
-        const total = this.countTotalFeedback();
-        const goodPer = this.countPositiveFeedbackPercentage(); 
-        return (
-            <div>
-                <Container 
-                    title="Leave feedback please">
+    const clickBtnVote = (nameBtn) => {
+        switch (nameBtn) {
+            case 'good':
+                return setGood((prev) => prev + 1);
+            case 'neutral':
+                return setNeutral((prev) => prev + 1);
+            case 'bad':
+                return setBad((prev) => prev + 1);
+            default:
+                return;
+        }  
+    }
+
+    const total = countTotalFeedback();
+    const goodPer = countPositiveFeedbackPercentage(good);
+
+    return (
+        <div>
+            <Container 
+                title="Leave feedback please">
                     <VoteActions
-                        clickBtnVote={this.clickBtnVote}
+                        clickBtnVote={clickBtnVote}
                     />
-                </Container>
-                <Container 
-                    title="Statistics">
+            </Container>
+            <Container 
+                title="Statistics">
                     <VoteResults
                         good={good}
                         neutral={neutral}
@@ -53,8 +51,8 @@ class Feedback extends Component {
                         total={total}
                         goodpersentage={goodPer}
                     />        
-                </Container>
-            </div>)
+            </Container>
+            </div>
+    )      
     }
-}
-export default Feedback;
+
